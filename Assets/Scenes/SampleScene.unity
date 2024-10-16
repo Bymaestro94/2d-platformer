@@ -354,6 +354,7 @@ GameObject:
   m_Component:
   - component: {fileID: 749580995}
   - component: {fileID: 749580994}
+  - component: {fileID: 749580996}
   m_Layer: 0
   m_Name: Animator
   m_TagString: Untagged
@@ -428,6 +429,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1520018625}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &749580996
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 749580993}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5b59b904d8b0449978fb44e7c84d780d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1520018622
 GameObject:
   m_ObjectHideFlags: 0
@@ -537,6 +559,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 463fd2635b1684f57988bf53d1cc081d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
