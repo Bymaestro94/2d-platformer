@@ -11,15 +11,24 @@ public class Player : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
+  
+    [Header("DoubleJump")]
+    [SerializeField] private float doubleJumpForce;
+    public bool canDoubleJump;
+
 
     [Header("Collision Info")]
     [SerializeField] private float groundCheckRadius;
     [SerializeField] private LayerMask whatIsGround; 
     private bool isGrounded;
-    private bool faceInRight = true;
-    private int faceInDir = 1;
+    private bool isAirBorne;
 
     private float xInput;
+
+    private bool faceInRight = true;
+    private int faceInDir = 1;
+    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +39,9 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        UpdateAirBorneJump();
+
         HandleCollision();
         HandleInput();
         HandleMovement();
@@ -37,20 +49,51 @@ public class Player : MonoBehaviour
         HandleAnimation();
     }
 
+    private void UpdateAirBorneJump(){
+        if (isGrounded && isAirBorne){
+            HandleLanding();
+        }
+
+        if (!isGrounded && !isAirBorne){
+            isAirBorne = true;
+        }
+    }
+
+    private void HandleLanding(){
+        isAirBorne = false;
+        canDoubleJump = true;
+    }
 
     private void HandleCollision(){
         isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckRadius, whatIsGround);
     }
 
     private void HandleInput(){
-        xInput = Input.GetAxis("Horizontal");
+        xInput = Input.GetAxisRaw("Horizontal");
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded){
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-        }
+        if (Input.GetKeyDown(KeyCode.Space))
+            JumpButton();
     }
+
+
+
     private void HandleMovement(){
         rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
+    }
+
+    private void JumpButton() {
+        if (isGrounded){
+            Jump();
+        } 
+        else if (canDoubleJump) {
+        DoubleJump();
+        }
+    }
+
+    private void Jump() => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    private void DoubleJump() {
+        canDoubleJump = false;
+        rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
     }
 
     private void HandleFlip(){
