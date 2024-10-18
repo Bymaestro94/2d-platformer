@@ -19,11 +19,14 @@ public class Player : MonoBehaviour
 
     [Header("Collision Info")]
     [SerializeField] private float groundCheckRadius;
+    [SerializeField] private float wallCheckDistance;
     [SerializeField] private LayerMask whatIsGround; 
     private bool isGrounded;
     private bool isAirBorne;
+    private bool isWallSliding;
 
     private float xInput;
+    private float yInput;
 
     private bool faceInRight = true;
     private int faceInDir = 1;
@@ -42,11 +45,24 @@ public class Player : MonoBehaviour
 
         UpdateAirBorneJump();
 
-        HandleCollision();
+
         HandleInput();
+        HandleWallSlide();
         HandleMovement();
         HandleFlip();
+        HandleCollision();
         HandleAnimation();
+    }
+
+    private void HandleWallSlide() {
+        bool canWallSlide = isWallSliding && rb.velocity.y < 0; 
+        float yModifier = yInput < 0 ? 1 : .05f;
+
+        if (canWallSlide == false) {
+            return;
+        }
+
+        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * yModifier);
     }
 
     private void UpdateAirBorneJump(){
@@ -66,10 +82,12 @@ public class Player : MonoBehaviour
 
     private void HandleCollision(){
         isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckRadius, whatIsGround);
+        isWallSliding = Physics2D.Raycast(transform.position, Vector2.right * faceInDir, wallCheckDistance, whatIsGround);
     }
 
     private void HandleInput(){
         xInput = Input.GetAxisRaw("Horizontal");
+        yInput = Input.GetAxisRaw("Vertical");
 
         if (Input.GetKeyDown(KeyCode.Space))
             JumpButton();
@@ -78,6 +96,11 @@ public class Player : MonoBehaviour
 
 
     private void HandleMovement(){
+
+        if(isWallSliding){
+            return;
+        }
+
         rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
     }
 
@@ -97,7 +120,7 @@ public class Player : MonoBehaviour
     }
 
     private void HandleFlip(){
-        if (rb.velocity.x < 0 && faceInRight || rb.velocity.x > 0 && !faceInRight) {
+        if (xInput < 0 && faceInRight || xInput > 0 && !faceInRight) {
             Flip();
         }
     }
@@ -112,8 +135,10 @@ public class Player : MonoBehaviour
         anim.SetFloat("xVelocity", rb.velocity.x);
         anim.SetFloat("yVelocity", rb.velocity.y);
         anim.SetBool("isGrounded", isGrounded);
+        anim.SetBool("isWallDetected", isWallSliding);
     }
     private void OnDrawGizmos(){
         Gizmos.DrawLine(transform.position, new Vector2(transform.position.x, transform.position.y - groundCheckRadius));
+        Gizmos.DrawLine(transform.position, new Vector2(transform.position.x + (wallCheckDistance * faceInDir), transform.position.y));
     }
 }
