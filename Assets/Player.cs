@@ -17,6 +17,12 @@ public class Player : MonoBehaviour
     public bool canDoubleJump;
 
 
+    [Header("Buffer & Cayote")]
+    [SerializeField] private float jumpBufferWindow = .25f;
+    private float jumpBufferActivated = -1;
+    [SerializeField] private float cayoteJumpWindow = .5f;
+    private float cayoteJumpActivated = -1;
+
     [Header("Wall interaction")]
     [SerializeField] private float wallJumpDuration = .6f;
     [SerializeField] private Vector2 wallJumpForce;
@@ -27,7 +33,6 @@ public class Player : MonoBehaviour
     [SerializeField] private float knockedDuration = 1;
     [SerializeField] private Vector2 knockedPower;
     private bool isKnocked;
-    private bool canBeKnocked;
 
 
     [Header("Collision")]
@@ -109,6 +114,8 @@ public class Player : MonoBehaviour
     private void HandleLanding(){
         isAirBorne = false;
         canDoubleJump = true;
+
+        AttemptBufferJump();
     }
 
     private void HandleCollision(){
@@ -120,11 +127,24 @@ public class Player : MonoBehaviour
         xInput = Input.GetAxisRaw("Horizontal");
         yInput = Input.GetAxisRaw("Vertical");
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space)){
             JumpButton();
+            RequestBufferJump();
+        }
+
     }
 
-
+    private void RequestBufferJump() {
+        if (isAirBorne) {
+            jumpBufferActivated = Time.time;
+        }
+    }
+    private void AttemptBufferJump() {
+        if (Time.time < jumpBufferActivated + jumpBufferWindow) {
+            jumpBufferActivated = 0;
+            Jump();
+        }
+    }
 
     private void HandleMovement(){
 
@@ -174,12 +194,10 @@ public class Player : MonoBehaviour
     }
 
     private IEnumerator KnockedRoutine(){
-        canBeKnocked = false;
         isKnocked = true;
 
     yield return new WaitForSeconds(knockedDuration);
 
-        canBeKnocked = true;
         isKnocked = false;
     }
 
